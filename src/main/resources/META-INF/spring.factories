@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+br.gov.es.pmo.indicator_parser.config.IndicatorParserAutoConfig
