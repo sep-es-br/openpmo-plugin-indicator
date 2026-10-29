@@ -4,19 +4,30 @@ plugins {
 }
 
 group = 'com.github.sep-es-br'
-version = '1.0.0'
+version = '1.2.0'
 
 sourceCompatibility = '11'
 targetCompatibility = '11'
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 repositories {
+    if (project.hasProperty('localIndicatorPlugins')) {
+        mavenLocal {
+            content {
+                includeModule 'com.github.sep-es-br', 'openpmo-plugin-indicator-interface'
+            }
+        }
+    }
     mavenCentral()
     maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux:2.2.12.RELEASE'
-    implementation 'com.github.sep-es-br:openpmo-plugin-indicator-interface:1.0.0'
+    implementation 'com.github.sep-es-br:openpmo-plugin-indicator-interface:1.2.0'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.2.12.RELEASE'
 }

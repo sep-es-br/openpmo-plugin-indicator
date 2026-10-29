@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import br.gov.es.pmo.indicator_interface.model.ChallengeDto;
 import br.gov.es.pmo.indicator_interface.model.IndicatorDto;
+import br.gov.es.pmo.indicator_interface.model.StrategicIndicatorDto;
 import br.gov.es.pmo.indicator_parser.model.PentahoQueryResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -64,5 +65,37 @@ class PentahoIndicatorProviderTest {
         assertEquals(20, challenges.get(1).getChallengeId());
         assertEquals(1, challenges.get(1).getManagementId());
         assertEquals("Área Temática", challenges.get(1).getSubgroupType());
+    }
+
+    @Test
+    void readsStrategicIndicatorsWithHierarchyFromMetadata() throws Exception {
+        String json = "{\"metadata\":["
+            + "{\"colName\":\"indicador\",\"colIndex\":0},"
+            + "{\"colName\":\"gestaoId\",\"colIndex\":1},"
+            + "{\"colName\":\"gestao\",\"colIndex\":2},"
+            + "{\"colName\":\"grupoId\",\"colIndex\":3},"
+            + "{\"colName\":\"grupoTipo\",\"colIndex\":4},"
+            + "{\"colName\":\"grupo\",\"colIndex\":5},"
+            + "{\"colName\":\"subgrupoId\",\"colIndex\":6},"
+            + "{\"colName\":\"subgrupoTipo\",\"colIndex\":7},"
+            + "{\"colName\":\"subgrupo\",\"colIndex\":8},"
+            + "{\"colName\":\"indicadorId\",\"colIndex\":9}],"
+            + "\"resultset\":[[\"PERCENTUAL DE CLASSIFICAÇÃO DO ÍNDICE DE QUALIDADE DO AR\","
+            + "0,\"Gestão 2019-22\",2,\"Área Estratégica\",\"Agricultura e Meio Ambiente\","
+            + "-1,\"-\",\"-\",155]],"
+            + "\"queryInfo\":{\"totalRows\":\"1\"}}";
+
+        List<StrategicIndicatorDto> indicators = PentahoIndicatorProvider.mapStrategicIndicators(
+            mapper.readValue(json, PentahoQueryResponse.class));
+
+        assertEquals(1, indicators.size());
+        assertEquals(0, indicators.get(0).getManagementId());
+        assertEquals("Gestão 2019-22", indicators.get(0).getManagement());
+        assertEquals("Área Estratégica", indicators.get(0).getGroupType());
+        assertEquals(-1, indicators.get(0).getSubgroupId());
+        assertEquals("-", indicators.get(0).getSubgroup());
+        assertEquals(155, indicators.get(0).getIndicatorId());
+        assertEquals("PERCENTUAL DE CLASSIFICAÇÃO DO ÍNDICE DE QUALIDADE DO AR",
+            indicators.get(0).getIndicator());
     }
 }
